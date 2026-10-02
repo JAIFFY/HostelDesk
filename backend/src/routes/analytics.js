@@ -1,0 +1,1 @@
+import {Router} from 'express'; import {auth,roles} from '../middleware/auth.js'; import * as c from '../controllers/analytics.js'; const r=Router();r.use(auth,roles('WARDEN','ADMIN'));r.get('/overview',c.overview);r.get('/categories',c.categories);r.get('/priorities',c.priorities);r.get('/blocks',c.blocks);r.get('/trends',c.trends);r.get('/insights',c.insights);export default r;

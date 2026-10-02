@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {classify} from '../src/classifier/index.js';
+test('spark complaint is Critical Electrical',()=>{const c=classify('There is a spark from the switchboard','C-312');assert.equal(c.category,'Electrical');assert.equal(c.priority,'Critical');assert.equal(c.team,'Electrical Team');});
+test('10+ affected Medium complaint escalates to High',()=>{const c=classify('The washroom tap is leaking and 12 students are affected','B-014');assert.equal(c.category,'Plumbing');assert.equal(c.priority,'High');assert.equal(c.affectedStudents,12);});
+test('fan complaint is Medium Electrical',()=>{const c=classify('The ceiling fan in room 204 is not working','B-204');assert.equal(c.category,'Electrical');assert.equal(c.priority,'Medium');assert.equal(c.team,'Electrical Team');});

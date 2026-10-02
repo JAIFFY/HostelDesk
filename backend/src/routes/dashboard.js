@@ -1,0 +1,1 @@
+import {Router} from 'express'; import {auth,roles} from '../middleware/auth.js'; import {overview} from '../controllers/dashboard.js'; const r=Router();r.get('/overview',auth,roles('WARDEN','ADMIN'),overview);export default r;

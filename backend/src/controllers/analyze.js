@@ -1,0 +1,2 @@
+import { classify } from '../classifier/index.js'; import { complaintSchema } from '../validators/schemas.js'; import { ok,fail } from '../utils/api.js';
+export function analyze(req,res){const p=complaintSchema.pick({description:true,roomNumber:true,location:true}).safeParse(req.body);if(!p.success)return fail(res,'Invalid complaint text',422);return ok(res,classify(p.data.description,p.data.roomNumber||p.data.location||''));}

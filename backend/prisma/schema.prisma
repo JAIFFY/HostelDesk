@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  WARDEN
+  ADMIN
+}
+
+enum ComplaintStatus {
+  Submitted
+  Assigned
+  InProgress
+  Resolved
+  Closed
+}
+
+enum Priority {
+  Critical
+  High
+  Medium
+  Low
+}
+
+enum Category {
+  Electrical
+  Plumbing
+  WaterSupply
+  InternetWiFi
+  Cleaning
+  Furniture
+  FoodMess
+  Security
+  RoomMaintenance
+  Other
+}
+
+enum Team {
+  ElectricalTeam
+  PlumbingTeam
+  Housekeeping
+  Security
+  HostelSupervisor
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  studentId    String?
+  roomNumber   String?
+  hostelBlock  String?
+
+  complaints Complaint[] @relation("ComplaintStudent")
+  assigned   Complaint[] @relation("ComplaintAssignee")
+  history    ComplaintHistory[] @relation("HistoryActor")
+  comments   ComplaintComment[] @relation("CommentAuthor")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Complaint {
+  id                String          @id @default(cuid())
+  complaintCode     String          @unique
+  studentId         String
+  description       String          @db.VarChar(500)
+  location          String?
+  roomNumber        String?
+  category          Category
+  priority          Priority
+  confidence        Int
+  assignedTeam      Team?
+  assignedToId      String?
+  status            ComplaintStatus @default(Submitted)
+  affectedStudents  Int             @default(1)
+  hostelBlock       String?
+  recommendedAction String
+  expectedResponse  String
+  aiReasoning       String
+  isAnonymous       Boolean         @default(false)
+  photoUrl          String?
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+
+  student   User  @relation("ComplaintStudent", fields: [studentId], references: [id])
+  assignedTo User? @relation("ComplaintAssignee", fields: [assignedToId], references: [id])
+
+  history  ComplaintHistory[]
+  comments ComplaintComment[]
+
+  @@index([studentId])
+  @@index([status, priority])
+  @@index([category])
+  @@index([hostelBlock])
+  @@index([createdAt])
+}
+
+model ComplaintHistory {
+  id          String          @id @default(cuid())
+  complaintId String
+  changedBy   String
+  oldStatus   ComplaintStatus?
+  newStatus   ComplaintStatus?
+  comment     String?
+  createdAt   DateTime        @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  actor     User      @relation("HistoryActor", fields: [changedBy], references: [id])
+
+  @@index([complaintId, createdAt])
+}
+
+model ComplaintComment {
+  id          String   @id @default(cuid())
+  complaintId String
+  authorId    String
+  body        String   @db.VarChar(1000)
+  createdAt   DateTime @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  author    User      @relation("CommentAuthor", fields: [authorId], references: [id])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  message     String
+  type        String   @default("info")
+  complaintId String?
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+}
