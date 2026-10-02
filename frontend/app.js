@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>'&#'+c.charCodeAt(0)+';');
-const API_BASE_URL=window.API_BASE_URL||'http://localhost:5000/api';
+const API_BASE_URL=window.API_BASE_URL||'https://hosteldesk-backend-751w.onrender.com/api';
 const PN={Critical:'C',High:'H',Medium:'M',Low:'L'},PO={Critical:0,High:1,Medium:2,Low:3};
 const PC={Critical:'#dc2626',High:'#c2410c',Medium:'#b45309',Low:'#15803d'};
 const TEAMS=['Electrical Team','Plumbing Team','Housekeeping','Security','Hostel Supervisor'];
